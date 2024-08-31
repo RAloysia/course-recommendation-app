@@ -79,7 +79,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.title('🎓 Professional Course Recommendation System')
+st.title('🎓 Course Recommendation System')
 st.write('Find the best courses tailored to your needs.')
 
 # Using tabs to organize content
@@ -101,13 +101,12 @@ with tab1:
             st.write("### Recommended Courses:")
             for index, row in recommendations.iterrows():
                 st.subheader(row['Title'])
-                with st.expander("Course Details"):
-                    st.markdown(f"**Organization**: {row['Organization']}")
-                    st.markdown(f"**Skills**: {row['Skills']}")
-                    st.markdown(f"**Rating**: {row['Ratings']} ⭐")
-                    st.markdown(f"**Difficulty**: {row['Difficulty']}")
-                    st.markdown(f"**Duration**: {row['Duration']} hours")
-                    st.markdown(f"[Course Link]({row['course_url']})")
+                st.markdown(f"**Organization**: {row['Organization']}")
+                st.markdown(f"**Skills**: {row['Skills']}")
+                st.markdown(f"**Rating**: {row['Ratings']} ⭐")
+                st.markdown(f"**Difficulty**: {row['Difficulty']}")
+                st.markdown(f"**Duration**: {row['Duration']} hours")
+                st.markdown(f"[Course Link]({row['course_url']})")
                 st.write("---")
         else:
             st.write("No recommendations found. Try a different query.")
@@ -134,4 +133,3 @@ with tab2:
             st.success("Thank you for your feedback!")
         else:
             st.error("Please enter your feedback before submitting.")
-
