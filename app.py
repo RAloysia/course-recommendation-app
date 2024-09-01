@@ -5,7 +5,7 @@ from sklearn.neighbors import NearestNeighbors
 import csv
 
 # Load the cleaned data
-df = pd.read_csv('D:/Precision Ranker/cleaned_courses.csv')
+df = pd.read_csv('cleaned_courses.csv')
 
 # Vectorize the combined features
 vectorizer = TfidfVectorizer(stop_words='english')
