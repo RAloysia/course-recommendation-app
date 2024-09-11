@@ -28,10 +28,6 @@ app.py: The main application file where all the logic and UI components are impl
 requirements.txt: Lists all the Python packages required to run this app.
 Dataset: The data used to train and test the recommendation engine. Make sure this file is in the correct format before running the app.
 
-🌟**Feedback**
-
-We value your feedback! If you have any suggestions, find any issues, or want to share your experience with the app, please use the feedback form within the app. This helps us make the system even better.
-
 **🙌 Acknowledgements**
 
 Special thanks to the developers and open-source contributors who made this project possible by providing the libraries and frameworks we used.
