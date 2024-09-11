@@ -1,83 +1,82 @@
 import streamlit as st
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.neighbors import NearestNeighbors
-import csv
+import requests
+from io import StringIO
+from collections import defaultdict
+import numpy as np
 
 # Load the cleaned data
-df = pd.read_csv("cleaned_courses.csv")
+csv_url = ("cleaned_courses")
 
-# Vectorize the combined features
-vectorizer = TfidfVectorizer(stop_words='english')
-tfidf_matrix = vectorizer.fit_transform(df['combined_features'])
+response = requests.get(csv_url)
+response.raise_for_status()  # Ensure the request was successful
 
-# Build the Nearest Neighbors model
-model = NearestNeighbors(n_neighbors=5, metric='cosine').fit(tfidf_matrix)
+# Load the CSV data into a pandas DataFrame
+df = pd.read_csv(StringIO(response.text))
 
-# Function to recommend courses based on user query
-def recommend_courses(query, difficulty=None, min_rating=0):
-    query_vector = vectorizer.transform([query])
-    distances, indices = model.kneighbors(query_vector)
-    recommendations = df.iloc[indices[0]]
+# Precompute Language Models for each document (course)
+def build_language_model(corpus):
+    models = []
+    for doc in corpus:
+        term_freq = defaultdict(int)
+        words = doc.split()
+        for word in words:
+            term_freq[word] += 1
+        total_words = len(words)
+        model = {word: freq / total_words for word, freq in term_freq.items()}
+        models.append(model)
+    return models
+
+df['combined_features'] = df['combined_features'].fillna('').str.lower()  # Convert course data to lowercase
+language_models = build_language_model(df['combined_features'])
+
+# Smoothing function (e.g., Laplace smoothing)
+def smooth_probability(prob, vocab_size):
+    return (prob + 1) / (vocab_size + 1)
+
+# Function to calculate query likelihood score
+def query_likelihood(query, language_models, vocab_size):
+    query_words = query.lower().split()  # Convert query to lowercase
+    scores = []
+    for model in language_models:
+        score = 1
+        for word in query_words:
+            word_prob = model.get(word, 0)
+            score *= smooth_probability(word_prob, vocab_size)
+        scores.append(score)
+    return np.array(scores)
+
+# Function to recommend courses based on user query using QLM
+def recommend_courses_qlm(query, difficulty=None, min_rating=0):
+    vocab_size = len(set(" ".join(df['combined_features']).split()))
+    scores = query_likelihood(query, language_models, vocab_size)
+    df['Score'] = scores
+    recommendations = df.sort_values('Score', ascending=False)
 
     if difficulty:
         recommendations = recommendations[recommendations['Difficulty'] == difficulty]
     recommendations = recommendations[recommendations['Ratings'] >= min_rating]
 
-    return recommendations[
-        ['Title', 'Organization', 'Skills', 'Ratings', 'Difficulty', 'Type', 'Duration', 'course_url']]
+    return recommendations.head(5)[['Title', 'Organization', 'Skills', 'Ratings', 'Difficulty', 'Type', 'Duration', 'course_url']]
 
 # Streamlit UI
 st.set_page_config(page_title="Course Recommendation System", page_icon="🎓", layout="wide")
 
-# Custom CSS for Professional Styling
-st.markdown(
-    """
+# Custom CSS for Professional Styling - Shade of White for Background
+st.markdown("""
     <style>
-    body {
-        background-color: #FAEBD7;
-        font-family: 'Arial', sans-serif;
-    }
-    .main {
-        background-color: #ffffff;
-        border-radius: 15px;
-        padding: 20px;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    }
-    .sidebar .sidebar-content {
-        background-color: #ADDFFF;
-        border-radius: 10px;
-        padding: 20px;
-    }
-    h1, h2, h3, h4, h5, h6 {
-        color: #2E4053;
-        font-family: 'Helvetica Neue', sans-serif;
-    }
-    p, div, .markdown-text-container {
-        color: #333333;
-    }
-    .stTextInput > div > div > input {
-        border: 1px solid #b6c5e4;
-        background-color: #f4faff;
-        border-radius: 5px;
-        padding: 8px;
-        font-size: 16px;
-    }
-    .stButton > button {
-        background-color: #5DADE2;
-        color: white;
-        border-radius: 8px;
-        padding: 10px 20px;
-        border: none;
-        font-size: 16px;
-    }
-    .stButton > button:hover {
-        background-color: #2874A6;
-    }
+        .main {
+            background-color: #f8f9fa;  /* Light white shade */
+        }
+        .stTextInput>div>div>input {
+            border: 2px solid #FFA500;
+        }
+        .stButton>button {
+            background-color: #FFA500;
+            color: white;
+        }
     </style>
-    """,
-    unsafe_allow_html=True
-)
+""", unsafe_allow_html=True)
 
 st.title('🎓 Course Recommendation System')
 st.write('Find the best courses tailored to your needs.')
@@ -95,7 +94,7 @@ with tab1:
     if user_query:
         difficulty = None if difficulty_filter == "All" else difficulty_filter
         with st.spinner("Fetching recommendations..."):
-            recommendations = recommend_courses(user_query, difficulty, min_rating_filter)
+            recommendations = recommend_courses_qlm(user_query, difficulty, min_rating_filter)
 
         if not recommendations.empty:
             st.write("### Recommended Courses:")
@@ -123,13 +122,4 @@ with tab2:
     st.write("- **Easy to use**: Just type in a topic or skill.")
     st.write("- **Filters**: Customize your search with difficulty and rating filters.")
     st.write("- **Comprehensive**: Get detailed course information.")
-    st.write("#### User Feedback")
-    feedback = st.text_area("Leave your feedback here:")
-    if st.button("Submit Feedback"):
-        if feedback:
-            with open("feedback.csv", "a", newline="", encoding="utf-8") as f:
-                writer = csv.writer(f)
-                writer.writerow([feedback])
-            st.success("Thank you for your feedback!")
-        else:
-            st.error("Please enter your feedback before submitting.")
+
