@@ -6,7 +6,7 @@ from collections import defaultdict
 import numpy as np
 
 # Load the cleaned data
-csv_url = ("cleaned_courses")
+csv_url = ("https://raw.githubusercontent.com/RAloysia/course-recommendation-app/main/cleaned_courses.csv")
 
 response = requests.get(csv_url)
 response.raise_for_status()  # Ensure the request was successful
