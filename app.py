@@ -2,81 +2,48 @@ import streamlit as st
 import pandas as pd
 import requests
 from io import StringIO
-from collections import defaultdict
-import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.neighbors import NearestNeighbors
 
-# Load the cleaned data
-csv_url = ("https://raw.githubusercontent.com/RAloysia/course-recommendation-app/main/cleaned_courses.csv")
-
+# Load the cleaned data from the GitHub repository
+csv_url = "https://raw.githubusercontent.com/RAloysia/course-recommendation-app/main/cleaned_courses.csv"
 response = requests.get(csv_url)
 response.raise_for_status()  # Ensure the request was successful
 
 # Load the CSV data into a pandas DataFrame
 df = pd.read_csv(StringIO(response.text))
 
-# Precompute Language Models for each document (course)
-def build_language_model(corpus):
-    models = []
-    for doc in corpus:
-        term_freq = defaultdict(int)
-        words = doc.split()
-        for word in words:
-            term_freq[word] += 1
-        total_words = len(words)
-        model = {word: freq / total_words for word, freq in term_freq.items()}
-        models.append(model)
-    return models
+# Preprocess the combined features
+df['combined_features'] = df['combined_features'].fillna('').str.lower()
 
-df['combined_features'] = df['combined_features'].fillna('').str.lower()  # Convert course data to lowercase
-language_models = build_language_model(df['combined_features'])
+# Handle missing or invalid URLs by replacing NaN with an empty string
+df['course_url'] = df['course_url'].fillna('')
 
-# Smoothing function (e.g., Laplace smoothing)
-def smooth_probability(prob, vocab_size):
-    return (prob + 1) / (vocab_size + 1)
+# Vectorize the combined features
+vectorizer = TfidfVectorizer(stop_words='english')
+tfidf_matrix = vectorizer.fit_transform(df['combined_features'])
 
-# Function to calculate query likelihood score
-def query_likelihood(query, language_models, vocab_size):
-    query_words = query.lower().split()  # Convert query to lowercase
-    scores = []
-    for model in language_models:
-        score = 1
-        for word in query_words:
-            word_prob = model.get(word, 0)
-            score *= smooth_probability(word_prob, vocab_size)
-        scores.append(score)
-    return np.array(scores)
+# Build the Nearest Neighbors model
+model = NearestNeighbors(n_neighbors=5, metric='cosine').fit(tfidf_matrix)
 
-# Function to recommend courses based on user query using QLM
-def recommend_courses_qlm(query, difficulty=None, min_rating=0):
-    vocab_size = len(set(" ".join(df['combined_features']).split()))
-    scores = query_likelihood(query, language_models, vocab_size)
-    df['Score'] = scores
-    recommendations = df.sort_values('Score', ascending=False)
 
-    if difficulty:
+# Function to recommend courses based on user query with filters
+def recommend_courses(query, difficulty=None, min_rating=0):
+    query_vector = vectorizer.transform([query])
+    distances, indices = model.kneighbors(query_vector)
+    recommendations = df.iloc[indices[0]][
+        ['Title', 'Organization', 'Skills', 'Ratings', 'Difficulty', 'Type', 'Duration', 'course_url']]
+
+    # Apply filters: Difficulty and Minimum Rating
+    if difficulty and difficulty != 'All':
         recommendations = recommendations[recommendations['Difficulty'] == difficulty]
     recommendations = recommendations[recommendations['Ratings'] >= min_rating]
 
-    return recommendations.head(5)[['Title', 'Organization', 'Skills', 'Ratings', 'Difficulty', 'Type', 'Duration', 'course_url']]
+    return recommendations
 
-# Streamlit UI
+
+# Streamlit app UI
 st.set_page_config(page_title="Course Recommendation System", page_icon="🎓", layout="wide")
-
-# Custom CSS for Professional Styling - Shade of White for Background
-st.markdown("""
-    <style>
-        .main {
-            background-color: #f8f9fa;  /* Light white shade */
-        }
-        .stTextInput>div>div>input {
-            border: 2px solid #FFA500;
-        }
-        .stButton>button {
-            background-color: #FFA500;
-            color: white;
-        }
-    </style>
-""", unsafe_allow_html=True)
 
 st.title('🎓 Course Recommendation System')
 st.write('Find the best courses tailored to your needs.')
@@ -94,18 +61,24 @@ with tab1:
     if user_query:
         difficulty = None if difficulty_filter == "All" else difficulty_filter
         with st.spinner("Fetching recommendations..."):
-            recommendations = recommend_courses_qlm(user_query, difficulty, min_rating_filter)
+            recommended_courses = recommend_courses(user_query, difficulty, min_rating_filter)
 
-        if not recommendations.empty:
+        if not recommended_courses.empty:
             st.write("### Recommended Courses:")
-            for index, row in recommendations.iterrows():
+            for index, row in recommended_courses.iterrows():
                 st.subheader(row['Title'])
                 st.markdown(f"**Organization**: {row['Organization']}")
                 st.markdown(f"**Skills**: {row['Skills']}")
                 st.markdown(f"**Rating**: {row['Ratings']} ⭐")
                 st.markdown(f"**Difficulty**: {row['Difficulty']}")
                 st.markdown(f"**Duration**: {row['Duration']} hours")
-                st.markdown(f"[Course Link]({row['course_url']})")
+
+                # Check if the course_url exists and is valid
+                if pd.notna(row['course_url']) and row['course_url'].startswith("http"):
+                    st.markdown(f"[Course Link]({row['course_url']})")
+                else:
+                    st.markdown("Course link not available.")
+
                 st.write("---")
         else:
             st.write("No recommendations found. Try a different query.")
@@ -122,4 +95,3 @@ with tab2:
     st.write("- **Easy to use**: Just type in a topic or skill.")
     st.write("- **Filters**: Customize your search with difficulty and rating filters.")
     st.write("- **Comprehensive**: Get detailed course information.")
-
