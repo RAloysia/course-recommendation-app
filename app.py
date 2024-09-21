@@ -17,7 +17,7 @@ df = pd.read_csv(StringIO(response.text))
 df['combined_features'] = df['combined_features'].fillna('').str.lower()
 
 # Handle missing or invalid URLs by replacing NaN with an empty string
-df['course_url'] = df['course_url'].fillna('')
+df['course_url'] = df['course_url'].fillna('https://www.coursera.org/?skipBrowseRedirect=true')
 
 # Vectorize the combined features
 vectorizer = TfidfVectorizer(stop_words='english')
