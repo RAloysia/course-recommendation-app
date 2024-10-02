@@ -97,7 +97,7 @@ st.markdown(
     }
 
     /* Responsive adjustments for smaller screens */
-    @media (max-width: 720px) {
+    @media (max-width: 728px) {
         .title {
             font-size: 2vw; /* Slightly larger on smaller screens */
             top: -250px; /* Adjust position for mobile */
