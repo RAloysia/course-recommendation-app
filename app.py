@@ -48,7 +48,7 @@ def recommend_courses(query, difficulty=None, min_rating=0):
 st.set_page_config(page_title="Course Recommendation System", page_icon="🎓", layout="wide")
 
 # Load background image using PIL
-bg_image = Image.open("images/learning_bg.jpeg")  # Adjust the path accordingly
+bg_image = Image.open("learning_bg.jpeg")  # Adjust the path accordingly
 
 # Display background image as full-screen
 st.image(bg_image, use_column_width=True)
@@ -163,7 +163,7 @@ st.markdown('<div class="title">🎓 Course Recommendation System</div>', unsafe
 tab1, tab2, tab3 = st.tabs(["🔍 Search", "📊 About", "📚 All Courses"])
 
 with tab1:
-    st.sidebar.image("images/online.gif", use_column_width=True)
+    st.sidebar.image("online.gif", use_column_width=True)
 
     st.sidebar.markdown('<div class="sidebar-title">🎯 Course Filters</div>', unsafe_allow_html=True)
     difficulty_filter = st.sidebar.selectbox("Difficulty Level", ["All", "Beginner", "Intermediate", "Advanced"])
