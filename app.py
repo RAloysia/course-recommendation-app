@@ -99,8 +99,8 @@ st.markdown(
     /* Responsive adjustments for smaller screens */
     @media (max-width: 720px) {
         .title {
-            font-size: 3vw; /* Slightly larger on smaller screens */
-            top: -300px; /* Adjust position for mobile */
+            font-size: 2.5vw; /* Slightly larger on smaller screens */
+            top: -250px; /* Adjust position for mobile */
             left: 15px;  /* Adjust left position */
         }
     }
@@ -108,7 +108,7 @@ st.markdown(
     @media (max-width: 480px) {
         .title {
             font-size: 8vw; /* Even larger on very small screens */
-            top: -120px;
+            top: -350px;
             left: 10px;
         }
     }
