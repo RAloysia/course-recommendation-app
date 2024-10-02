@@ -99,7 +99,7 @@ st.markdown(
     /* Responsive adjustments for smaller screens */
     @media (max-width: 720px) {
         .title {
-            font-size: 2.5vw; /* Slightly larger on smaller screens */
+            font-size: 2vw; /* Slightly larger on smaller screens */
             top: -250px; /* Adjust position for mobile */
             left: 15px;  /* Adjust left position */
         }
