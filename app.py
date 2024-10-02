@@ -53,7 +53,6 @@ bg_image = Image.open("learning_bg.jpeg")  # Adjust the path accordingly
 # Display background image as full-screen
 st.image(bg_image, use_column_width=True)
 
-# Custom CSS for sidebar styling
 st.markdown(
     """
     <style>
@@ -86,20 +85,37 @@ st.markdown(
     .stTab {
         background-color: rgba(210, 250, 243);  /* Semi-transparent tabs */
     }
+    
     .title {
         position: absolute;
-        top: -250px;  /* Adjust the top position (move it up) */
-        left: 30px; /* Adjust the left position */
-        color: #010345; /* Set text color */
-        font-size: 30px; /* Adjust font size */
-        font-weight: bold; /* Make the title bold */
-        z-index: 10; /* Bring the title above other elements */
+        top: -200px;
+        left: 30px;
+        color: #010345;
+        font-size: 5vw; /* Responsive font size based on viewport width */
+        font-weight: bold;
+        z-index: 10;
+    }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 768px) {
+        .title {
+            font-size: 6vw; /* Slightly larger on smaller screens */
+            top: -150px; /* Adjust position for mobile */
+            left: 15px;  /* Adjust left position */
+        }
+    }
+
+    @media (max-width: 480px) {
+        .title {
+            font-size: 8vw; /* Even larger on very small screens */
+            top: -120px;
+            left: 10px;
+        }
     }
     </style>
     """,
     unsafe_allow_html=True
 )
-
 # App title and description overlay
 st.markdown('<div class="title">🎓 Course Recommendation System</div>', unsafe_allow_html=True)
 
