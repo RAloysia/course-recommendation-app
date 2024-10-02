@@ -91,7 +91,7 @@ st.markdown(
         top: -250px;  /* Adjust the top position (move it up) */
         left: 30px; /* Adjust the left position */
         color: #010345; /* Set text color */
-        font-size: 38px; /* Adjust font size */
+        font-size: 35px; /* Adjust font size */
         font-weight: bold; /* Make the title bold */
         z-index: 10; /* Bring the title above other elements */
     }
