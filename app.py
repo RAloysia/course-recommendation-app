@@ -107,9 +107,9 @@ st.markdown(
 
     @media (max-width: 480px) {
         .title {
-            font-size: 5vw; /* Even larger on very small screens */
+            font-size: 5.5vw; /* Even larger on very small screens */
             top: -150px;
-            left: 10px;
+            left: 12px;
         }
     }
     </style>
