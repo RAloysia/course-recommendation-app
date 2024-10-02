@@ -89,7 +89,7 @@ st.markdown(
     .title {
         position: absolute;
         top: -250px;
-        left: 30px;
+        left: 35px;
         color: #010345;
         font-size: 3vw; /* Responsive font size based on viewport width */
         font-weight: bold;
@@ -108,8 +108,8 @@ st.markdown(
     @media (max-width: 480px) {
         .title {
             font-size: 5.5vw; /* Even larger on very small screens */
-            top: -150px;
-            left: 12px;
+            top: -250px;
+            left: 10px;
         }
     }
     </style>
