@@ -91,7 +91,7 @@ st.markdown(
         top: -300px;
         left: 30px;
         color: #010345;
-        font-size: 2vw; /* Responsive font size based on viewport width */
+        font-size: 3vw; /* Responsive font size based on viewport width */
         font-weight: bold;
         z-index: 10;
     }
