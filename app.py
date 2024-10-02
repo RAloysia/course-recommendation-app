@@ -97,18 +97,18 @@ st.markdown(
     }
 
     /* Responsive adjustments for smaller screens */
-    @media (max-width: 728px) {
+    @media (max-width: 780px) {
         .title {
-            font-size: 2vw; /* Slightly larger on smaller screens */
-            top: -250px; /* Adjust position for mobile */
+            font-size: 6vw; /* Slightly larger on smaller screens */
+            top: -150px; /* Adjust position for mobile */
             left: 15px;  /* Adjust left position */
         }
     }
 
     @media (max-width: 480px) {
         .title {
-            font-size: 8vw; /* Even larger on very small screens */
-            top: -350px;
+            font-size: 6vw; /* Even larger on very small screens */
+            top: -150px;
             left: 10px;
         }
     }
