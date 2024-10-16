@@ -18,15 +18,20 @@ Detailed Course Information: Each recommendation includes details like the organ
 🛠️ **Technology Stack**
 
 Streamlit: A powerful and easy-to-use framework for creating web applications.
+
 scikit-learn: Utilized for the machine learning models that drive the recommendation system.
+
 Pandas: Used for data manipulation and analysis.
+
 Python: The core programming language behind the project.
 
 📂 **Project Structure**
 
 app.py: The main application file where all the logic and UI components are implemented.
+
 requirements.txt: Lists all the Python packages required to run this app.
-Dataset: The data used to train and test the recommendation engine. Make sure this file is in the correct format before running the app.
+
+Dataset: The data used to train and test the recommendation engine.
 
 **🙌 Acknowledgements**
 
